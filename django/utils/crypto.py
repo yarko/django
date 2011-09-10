@@ -2,22 +2,20 @@
 Django's standard crypto functions and utilities.
 """
 
-import random
+from django.conf import settings
+from string import digits, letters
 import hashlib
 import hmac
-from django.conf import settings
-
-
+import random
 try:
     random = random.SystemRandom()
 except NotImplementedError:
     random = random.random()
 
+    
+#ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-
-def base62_encode(num, alphabet=ALPHABET):
+def base62_encode(num, alphabet=digits+letters):
     """Encode a number in Base X
 
     `num`: The number to encode
@@ -42,13 +40,13 @@ class Token():
         else:
             self._hash = hashlib.md5(value)
 
-    def base_16_digest(self, length=None):
+    def base16_digest(self, length=None):
         """
         Outputs our hash to a base 16 string.
         """
         return self._hash.hexdigest()[:length]
 
-    def base_62_digest(self, length=None):
+    def base62_digest(self, length=None):
         """
         Outputs our hash to a base 62 string.
         """

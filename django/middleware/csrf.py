@@ -41,7 +41,7 @@ def _get_failure_view():
 def _get_new_csrf_key():
     # yak: return hashlib.md5("%s%s" % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hexdigest()
     t=Token("%s%s" % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)
-    return t.base_16_digest()
+    return t.base16_digest()
 
 
 def get_token(request):
