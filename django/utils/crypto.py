@@ -15,6 +15,7 @@ except NotImplementedError:
 
 
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 def base62_encode(num, alphabet=ALPHABET):
@@ -35,6 +36,21 @@ def base62_encode(num, alphabet=ALPHABET):
     return ''.join(arr)
 
 
+class RandomToken():
+    def digits(self):
+        # Probably want to implement the NotImplementedError
+        pass
+    
+    def digits(self):
+        # Probably want to implement the NotImplementedError
+        pass
+        
+    def alphanumeric(self, length=32, case_sensitive=True):
+        # Probably want to implement the NotImplementedError
+        pass
+    
+    def digits(self):
+        
 class Token():
     def __init__(self, value=None, random=False):
         if random:
