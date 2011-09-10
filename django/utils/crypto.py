@@ -14,11 +14,7 @@ except NotImplementedError:
     random = random.random()
 
     
-#ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
 # Alphabet naming:
-
-
 ## imported from string:
 # digits
 # lowercase
@@ -34,11 +30,7 @@ LOWER_ALPHANUMERIC = string.digits + string.lowercase
 # effectively: for i in 'ilIoO01': x.remove(i)
 READABLE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz'
 
-
 DEFAULT_TOKEN_LENGTH = 32
-
-
-
 
 def base62_encode(num, alphabet=digits+letters):
     """Encode a number in Base X
@@ -90,47 +82,34 @@ class RandomToken():
         Builds a random token of the specified length using the characters available in the specified character set.
         """
         return ''.join([random.choice(character_set) for i in range(length)])
-        
-class Base_Token():
-    def __init__(self, value=None, random=False):
-        if random:
-            self._hash = hashlib.md5(random.getrandbits(256))
-        else:
-            self._hash = hashlib.md5(value)
 
-    def base16(self, length=None):
-        """
-        Outputs our hash to a base 16 string.
-        """
+class HashToken():
+    """
+    Return a token useful for a hash (that is, a token whose generation is repeatable)
+    """
+    def __init__(self, value=None):
+        self._hash = hashlib.md5(value)
+
+    def digits(self, length=None):
+        return _build_token(DIGITS, length)
+        
+    def hex(self, length=None):
+        """ Outputs a base 16 string. """
         return self._hash.hexdigest()[:length]
+    
+    def alphanumenric(self, length=None, casesensitive=True):
+        return _build_token(ALPHANUMERIC, length)
 
-    def base62(self, length=None):
-        """
-        Outputs our hash to a base 62 string.
-        """
-        base16 = self._hash.hexdigest()
-        base10 = int(base16, 16)
-        
-
-        # return base62.encode...
-        # return base62_encode(base10)[:length]
-        
+    def _build_token(self, alphabet, length=None):
+        """ Outputs our hash to an alphabet specified string. """
+        hextoken = self._hash.hexdigest()
+        converter = BaseConverter(alphabet)
+        return converter.encode(int(hextoken, 16))[:length]
 
     def update(self, value):
         self._hash = self._hash.update(value)
 
 
-class HashToken(BaseToken):
-    """
-    Use for reproducible hash patterns
-    """
-
-class RandomToken(BaseToken):
-    """
-    Use for receiving random hash tokens
-    """
-    
-    
 
 def salted_hmac(key_salt, value, secret=None):
     """
