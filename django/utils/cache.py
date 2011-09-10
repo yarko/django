@@ -95,7 +95,7 @@ def get_max_age(response):
 
 def _set_response_etag(response):
     # response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
-    response['ETag'] = '"%s"' % Token(response.content).base_16_digest()
+    response['ETag'] = '"%s"' % Token(response.content).base16_digest()
     return response
 
 def patch_response_headers(response, cache_timeout=None):

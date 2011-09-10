@@ -2,23 +2,39 @@
 Django's standard crypto functions and utilities.
 """
 
-import random
+from django.conf import settings
+from django.utils.baseconv import BaseConverter
+import string
 import hashlib
 import hmac
-from django.conf import settings
-
-
+import random
 try:
     random = random.SystemRandom()
 except NotImplementedError:
     random = random.random()
 
+    
+#ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# Alphabet naming:
 
 
-def base62_encode(num, alphabet=ALPHABET):
+## imported from string:
+# digits
+# lowercase
+# uppercase
+
+ALLCASE_ALPHANUMERIC = string.digits + string.uppercase + string.lowercase
+DIGITS = string.digits
+UPPERCASE = string.uppercase
+LOWERCASE = string.lowercase
+HEX = string.digits + 'abcdef'
+# remove for human consumption - we don't want confusion between letter-O and zero
+# effectively: for i in 'ilIoO01': x.remove(i)
+READABLE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijklmnpqrstuvwxyz'
+
+
+def base62_encode(num, alphabet=digits+letters):
     """Encode a number in Base X
 
     `num`: The number to encode
@@ -35,7 +51,6 @@ def base62_encode(num, alphabet=ALPHABET):
     arr.reverse()
     return ''.join(arr)
 
-
 class RandomToken():
     def digits(self):
         # Probably want to implement the NotImplementedError
@@ -48,34 +63,47 @@ class RandomToken():
     def alphanumeric(self, length=32, case_sensitive=True):
         # Probably want to implement the NotImplementedError
         pass
-    
-    def digits(self):
         
-class Token():
+class Base_Token():
     def __init__(self, value=None, random=False):
         if random:
             self._hash = hashlib.md5(random.getrandbits(256))
         else:
             self._hash = hashlib.md5(value)
 
-    def base_16_digest(self, length=None):
+    def base16(self, length=None):
         """
         Outputs our hash to a base 16 string.
         """
         return self._hash.hexdigest()[:length]
 
-    def base_62_digest(self, length=None):
+    def base62(self, length=None):
         """
         Outputs our hash to a base 62 string.
         """
         base16 = self._hash.hexdigest()
         base10 = int(base16, 16)
+        
 
-        return base62_encode(base10)[:length]
+        # return base62.encode...
+        # return base62_encode(base10)[:length]
+        
 
     def update(self, value):
         self._hash = self._hash.update(value)
 
+
+class HashToken(BaseToken):
+    """
+    Use for reproducible hash patterns
+    """
+
+class RandomToken(BaseToken):
+    """
+    Use for receiving random hash tokens
+    """
+    
+    
 
 def salted_hmac(key_salt, value, secret=None):
     """
