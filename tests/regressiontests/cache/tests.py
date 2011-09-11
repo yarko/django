@@ -4,7 +4,6 @@
 # Uses whatever cache backend is set in the test settings file.
 from __future__ import with_statement
 
-import hashlib
 import os
 import re
 import tempfile
@@ -27,6 +26,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
 from django.utils import translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
+from django.utils.token import HashToken
 from django.views.decorators.cache import cache_page
 
 from regressiontests.cache.models import Poll, expensive_calculation
@@ -873,7 +873,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         """Test that keys are hashed into subdirectories correctly"""
         self.cache.set("foo", "bar")
         key = self.cache.make_key("foo")
-        keyhash = hashlib.md5(key).hexdigest()
+        keyhash = HashToken(key).hex()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assertTrue(os.path.exists(keypath))
 
@@ -883,7 +883,7 @@ class FileBasedCacheTests(unittest.TestCase, BaseCacheTests):
         """
         self.cache.set("foo", "bar")
         key = self.cache.make_key("foo")
-        keyhash = hashlib.md5(key).hexdigest()
+        keyhash = HashToken(key).hex()
         keypath = os.path.join(self.dirname, keyhash[:2], keyhash[2:4], keyhash[4:])
         self.assertTrue(os.path.exists(keypath))
 

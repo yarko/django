@@ -1,5 +1,4 @@
 from __future__ import with_statement
-import hashlib
 import os
 import posixpath
 import re
@@ -14,6 +13,7 @@ from django.utils.encoding import force_unicode
 from django.utils.functional import LazyObject
 from django.utils.importlib import import_module
 from django.utils.datastructures import SortedDict
+from django.utils.token import HashToken
 
 from django.contrib.staticfiles.utils import check_settings, matches_patterns
 
@@ -76,11 +76,11 @@ class CachedFilesMixin(object):
         path, filename = os.path.split(name)
         root, ext = os.path.splitext(filename)
         # Get the MD5 hash of the file
-        md5 = hashlib.md5()
+        token = HashToken()
         for chunk in content.chunks():
-            md5.update(chunk)
-        md5sum = md5.hexdigest()[:12]
-        return os.path.join(path, u"%s.%s%s" % (root, md5sum, ext))
+            token.update(chunk)
+        token_sum = token.hex()[:12]
+        return os.path.join(path, u"%s.%s%s" % (root, token_sum, ext))
 
     def cache_key(self, name):
         return u'staticfiles:cache:%s' % name

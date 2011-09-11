@@ -1,5 +1,4 @@
 import base64
-import hashlib
 import os
 import random
 import time
@@ -12,6 +11,7 @@ except ImportError:
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.utils.crypto import constant_time_compare, salted_hmac
+from django.utils.token import HashToken
 
 # Use the system (hardware-based) random number generator if it exists.
 if hasattr(random, 'SystemRandom'):
@@ -145,9 +145,9 @@ class SessionBase(object):
             # No getpid() in Jython, for example
             pid = 1
         while 1:
-            session_key = hashlib.md5("%s%s%s%s"
+            session_key = HashToken("%s%s%s%s"
                     % (randrange(0, MAX_SESSION_KEY), pid, time.time(),
-                       settings.SECRET_KEY)).hexdigest()
+                       settings.SECRET_KEY)).hex()
             if not self.exists(session_key):
                 break
         return session_key
