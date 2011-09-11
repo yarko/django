@@ -26,7 +26,7 @@ from django.core.cache import get_cache
 from django.utils.encoding import smart_str, iri_to_uri
 from django.utils.http import http_date
 from django.utils.translation import get_language
-from django.utils.crypto import Token
+from django.utils.crypto import HashToken
 
 cc_delim_re = re.compile(r'\s*,\s*')
 
@@ -95,7 +95,7 @@ def get_max_age(response):
 
 def _set_response_etag(response):
     # response['ETag'] = '"%s"' % hashlib.md5(response.content).hexdigest()
-    response['ETag'] = '"%s"' % Token(response.content).base16_digest()
+    response['ETag'] = '"%s"' % HashToken(response.content).hex()
     return response
 
 def patch_response_headers(response, cache_timeout=None):
@@ -170,21 +170,21 @@ def _i18n_cache_key_suffix(request, cache_key):
 def _generate_cache_key(request, method, headerlist, key_prefix):
     """Returns a cache key from the headers given in the header list."""
     # ctx = hashlib.md5()
-    ctx = Token()
+    ctx = HashToken()
     for header in headerlist:
         value = request.META.get(header, None)
         if value is not None:
             ctx.update(value)
     # path = hashlib.md5(iri_to_uri(request.get_full_path()))
-    path = Token(iri_to_uri(request.get_full_path()))
+    path = HashToken(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_page.%s.%s.%s.%s' % (
-        key_prefix, request.method, path.base_16_digest(), ctx.base_16_digest())
+        key_prefix, request.method, path.hex(), ctx.hex())
     return _i18n_cache_key_suffix(request, cache_key)
 
 def _generate_cache_header_key(key_prefix, request):
     """Returns a cache key for the header cache."""
     # path = hashlib.md5(iri_to_uri(request.get_full_path()))
-    path = Token(iri_to_uri(request.get_full_path()))
+    path = HashToken(iri_to_uri(request.get_full_path()))
     cache_key = 'views.decorators.cache.cache_header.%s.%s' % (
         key_prefix, path.base_16_digest())
     return _i18n_cache_key_suffix(request, cache_key)
