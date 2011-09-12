@@ -71,7 +71,7 @@ class HashToken():
     """
     Return a token useful for a hash (that is, a token whose generation is repeatable)
     """
-    def __init__(self, value=None):
+    def __init__(self, value=''):
         self._hash = hashlib.sha256(value)
 
     def digits(self):
