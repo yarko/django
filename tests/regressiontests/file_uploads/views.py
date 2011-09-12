@@ -2,7 +2,7 @@ import os
 from django.core.files.uploadedfile import UploadedFile
 from django.http import HttpResponse, HttpResponseServerError
 from django.utils import simplejson
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 from models import FileModel, UPLOAD_TO
 from uploadhandler import QuotaUploadHandler, ErroringUploadHandler
 from tests import UNICODE_FILENAME

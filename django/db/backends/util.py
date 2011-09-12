@@ -3,7 +3,7 @@ import decimal
 from time import time
 
 from django.utils.log import getLogger
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 
 logger = getLogger('django.db.backends')

@@ -14,7 +14,7 @@ from django.utils.cache import patch_vary_headers
 from django.utils.http import same_origin
 from django.utils.log import getLogger
 from django.utils.crypto import constant_time_compare
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 
 logger = getLogger('django.request')
 

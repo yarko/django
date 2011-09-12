@@ -26,7 +26,7 @@ from django.test.utils import (get_warnings_state, restore_warnings_state,
 from django.utils import translation, unittest
 from django.utils.cache import (patch_vary_headers, get_cache_key,
     learn_cache_key, patch_cache_control, patch_response_headers)
-from django.utils.token import HashToken
+from django.utils.tokens import HashToken
 from django.views.decorators.cache import cache_page
 
 from regressiontests.cache.models import Poll, expensive_calculation
