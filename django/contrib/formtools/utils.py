@@ -3,9 +3,9 @@ try:
 except ImportError:
     import pickle
 
-import hashlib
 from django.conf import settings
 from django.utils.crypto import salted_hmac
+from django.utils.token import HashToken
 
 
 def security_hash(request, form, *args):
@@ -13,7 +13,7 @@ def security_hash(request, form, *args):
     Calculates a security hash for the given Form instance.
 
     This creates a list of the form field names/values in a deterministic
-    order, pickles the result with the SECRET_KEY setting, then takes an md5
+    order, pickles the result with the SECRET_KEY setting, then takes a
     hash of that.
     """
     import warnings
@@ -37,7 +37,7 @@ def security_hash(request, form, *args):
     # Use HIGHEST_PROTOCOL because it's the most efficient.
     pickled = pickle.dumps(data, pickle.HIGHEST_PROTOCOL)
 
-    return hashlib.md5(pickled).hexdigest()
+    return HashToken(pickled).hex()
 
 
 def form_hmac(form):

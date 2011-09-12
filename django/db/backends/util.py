@@ -1,9 +1,9 @@
 import datetime
 import decimal
-import hashlib
 from time import time
 
 from django.utils.log import getLogger
+from django.utils.token import HashToken
 
 
 logger = getLogger('django.db.backends')
@@ -130,7 +130,7 @@ def truncate_name(name, length=None, hash_len=4):
     if length is None or len(name) <= length:
         return name
 
-    hsh = hashlib.md5(name).hexdigest()[:hash_len]
+    hsh = HashToken(name).hex()[:hash_len]
     return '%s%s' % (name[:length-hash_len], hsh)
 
 def format_number(value, max_digits, decimal_places):
