@@ -39,7 +39,7 @@ def _get_failure_view():
 
 
 def _get_new_csrf_key():
-    return HashToken("%s%s" % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY).hex()
+    return HashToken("%s%s" % (randrange(0, _MAX_CSRF_KEY), settings.SECRET_KEY)).hex()
 
 
 def get_token(request):
