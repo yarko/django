@@ -6,14 +6,15 @@ from django.core.mail import send_mail
 from django.db import models
 from django.db.models.manager import EmptyManager
 from django.utils.encoding import smart_str
+from django.utils.tokens import RandomToken
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib import auth
 from django.contrib.auth.signals import user_logged_in
 # UNUSABLE_PASSWORD is still imported here for backwards compatibility
 from django.contrib.auth.utils import (get_hexdigest, make_password,
-        check_password, is_password_usable, get_random_string,
-        UNUSABLE_PASSWORD)
+        check_password, is_password_usable, UNUSABLE_PASSWORD)
+
 from django.contrib.contenttypes.models import ContentType
 
 def update_last_login(sender, user, **kwargs):
@@ -124,9 +125,9 @@ class UserManager(models.Manager):
         Generates a random password with the given length
         and given allowed_chars
         """
-        # Note that default value of allowed_chars does not have "I" or letters
-        # that look like it -- just to avoid confusion.
-        return get_random_string(length, allowed_chars)
+        # Note that default value of allowed_chars does not have "I", "0", or letters
+        # that look like them -- just to avoid confusion.
+        return RandomToken().readable_alphabet(length=length)
 
 
 # A few helper functions for common logic between User and AnonymousUser.
@@ -228,7 +229,7 @@ class User(models.Model):
         return full_name.strip()
 
     def set_password(self, raw_password):
-        self.password = make_password('sha1', raw_password)
+        self.password = make_password('sha256', raw_password)
 
     def check_password(self, raw_password):
         """
@@ -238,6 +239,7 @@ class User(models.Model):
         # Backwards-compatibility check. Older passwords won't include the
         # algorithm or salt.
         if '$' not in self.password:
+            # for tests also - this is the default algo
             is_correct = (self.password == get_hexdigest('md5', '', raw_password))
             if is_correct:
                 # Convert the password to the new, more secure format.
@@ -248,7 +250,7 @@ class User(models.Model):
 
     def set_unusable_password(self):
         # Sets a value that will never be a valid hash
-        self.password = make_password('sha1', None)
+        self.password = make_password('sha256', None)
 
     def has_usable_password(self):
         return is_password_usable(self.password)

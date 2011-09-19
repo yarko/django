@@ -1,6 +1,7 @@
 import hashlib
 from django.utils.encoding import smart_str
 from django.utils.crypto import constant_time_compare
+from django.utils.tokens import HashToken, RandomToken
 
 UNUSABLE_PASSWORD = '!' # This will never be a valid hash
 
@@ -17,26 +18,18 @@ def get_hexdigest(algorithm, salt, raw_password):
             raise ValueError('"crypt" password algorithm not supported in this environment')
         return crypt.crypt(raw_password, salt)
 
-    if algorithm == 'md5':
+    if algorithm == 'sha256':
+        # If we wanted, we could return base-62 digest (tests pass as of now);
+        #  return HashToken(salt + raw_password).alphanumeric()
+        # but processing is more, and we're not going to present this to anyone,
+        #  so hex is fine, if not as dense.
+        return HashToken(salt + raw_password).hex()
+    elif algorithm == 'md5':
         return hashlib.md5(salt + raw_password).hexdigest()
     elif algorithm == 'sha1':
         return hashlib.sha1(salt + raw_password).hexdigest()
     raise ValueError("Got unknown password algorithm type in password.")
 
-def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
-    """
-    Returns a random string of length characters from the set of a-z, A-Z, 0-9
-    for use as a salt.
-
-    The default length of 12 with the a-z, A-Z, 0-9 character set returns
-    a 71-bit salt. log_2((26+26+10)^12) =~ 71 bits
-    """
-    import random
-    try:
-        random = random.SystemRandom()
-    except NotImplementedError:
-        pass
-    return ''.join([random.choice(allowed_chars) for i in range(length)])
 
 def check_password(raw_password, enc_password):
     """
@@ -58,6 +51,6 @@ def make_password(algo, raw_password):
     """
     if raw_password is None:
         return UNUSABLE_PASSWORD
-    salt = get_random_string()
+    salt = RandomToken().alphanumeric()
     hsh = get_hexdigest(algo, salt, raw_password)
     return '%s$%s$%s' % (algo, salt, hsh)

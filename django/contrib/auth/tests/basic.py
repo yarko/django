@@ -126,6 +126,10 @@ class PasswordUtilsTestCase(TestCase):
         self.assertFalse(utils.is_password_usable(password))
         self.assertFalse(utils.check_password("foobar", password))
 
+    def test_make_password_sha256(self):
+        "Check creating passwords with SHA256 algorithm."
+        self._test_make_password("sha256")
+
     def test_make_password_sha1(self):
         "Check creating passwords with SHA1 algorithm."
         self._test_make_password("sha1")
